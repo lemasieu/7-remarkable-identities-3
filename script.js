@@ -99,10 +99,9 @@ function polyToString(poly, varX, varY) {
 }
 
 
-// --- 2. LOGIC SINH ĐỀ ASIAN MODE (MIX & MATCH TEMPLATES) ---
+// --- 2. LOGIC SINH ĐỀ ASIAN MODE NÂNG CẤP (Random Inner Exponents) ---
 
 function generateAsianQuestion() {
-    // Bộ biến số ngẫu nhiên đa dạng nhằm tăng độ khó thị giác
     const varPool = [ ['x', 'y'], ['a', 'b'], ['u', 'v'] ];
     const [varX, varY] = varPool[Math.floor(Math.random() * varPool.length)];
     
@@ -111,148 +110,224 @@ function generateAsianQuestion() {
     let B;
     do { B = coeffs[Math.floor(Math.random() * coeffs.length)]; } while (A === B);
 
-    // Khởi tạo các đa thức cơ sở nguyên bản
-    const polyPlus = { "1,0": A, "0,1": B };       // (Ax + By)
-    const polyMinus = { "1,0": A, "0,1": -B };     // (Ax - By)
+    // BƯỚC NHẢY VỌT: Khởi tạo số mũ ngẫu nhiên (từ 1 đến 3) cho các biến bên trong
+    const ex = Math.floor(Math.random() * 3) + 1; // Số mũ của biến thứ nhất (vd: x^2)
+    const ey = Math.floor(Math.random() * 3) + 1; // Số mũ của biến thứ hai (vd: y^3)
 
-    // Danh sách các Template đề trộn lẫn cực gắt kiểu Châu Á
+    // Khởi tạo các đa thức cơ sở nguyên bản với số mũ ngẫu nhiên
+    const polyPlus = { [`${ex},0`]: A, [`0,${ey}`]: B };       // (A.x^ex + B.y^ey)
+    const polyMinus = { [`${ex},0`]: A, [`0,${ey}`]: -B };     // (A.x^ex - B.y^ey)
+    const polySinglePlus = { [`${ex},0`]: A, "0,0": B };       // (A.x^ex + B)
+
+    // Các hàm Helper nhỏ để render chuỗi HTML đẹp mắt cho biến số mũ ngẫu nhiên
+    const fVar = (v, e) => e === 1 ? v : `${v}<sup>${e}</sup>`;
+    const strAx = `${A}${fVar(varX, ex)}`; // Tạo chuỗi dạng: 2x^2
+    const strBy = `${B}${fVar(varY, ey)}`; // Tạo chuỗi dạng: 3y^3
+    const strX = fVar(varX, ex);
+    const strY = fVar(varY, ey);
+
     const templates = [
-        // Dạng 1: (Ax + By)^2 + (Ax + By)(Ax - By) => Máy tự rút gọn hạng tử đồng dạng
+        // Dạng 1: Bình phương của tổng + Hiệu hai bình phương
         () => {
             let p1 = polyPow(polyPlus, 2);
             let p2 = polyMul(polyPlus, polyMinus);
             let finalPoly = polyAdd(p1, p2);
 
             let qStr = polyToString(finalPoly, varX, varY);
-            let aStr = `(${A}${varX} + ${B}${varY})<sup>2</sup> + (${A}${varX} + ${B}${varY}).(${A}${varX} - ${B}${varY})`;
-            
-            let w1 = `(${A}${varX} - ${B}${varY})<sup>2</sup> + (${A}${varX} + ${B}${varY}).(${A}${varX} - ${B}${varY})`;
-            let w2 = `(${A}${varX} + ${B}${varY})<sup>2</sup> - (${A}${varX} + ${B}${varY}).(${A}${varX} - ${B}${varY})`;
-            let w3 = `(${A}${varX} + ${B}${varY})<sup>2</sup> + (${A}${varX} + ${B}${varY})<sup>2</sup>`;
+            let aStr = `(${strAx} + ${strBy})<sup>2</sup> + (${strAx} + ${strBy}).(${strAx} - ${strBy})`;
+            let w1 = `(${strAx} - ${strBy})<sup>2</sup> + (${strAx} + ${strBy}).(${strAx} - ${strBy})`;
+            let w2 = `(${strAx} + ${strBy})<sup>2</sup> - (${strAx} + ${strBy}).(${strAx} - ${strBy})`;
+            let w3 = `(${strAx} + ${strBy})<sup>2</sup> + (${strAx} + ${strBy})<sup>2</sup>`;
             
             return { q: qStr, a: aStr, w: [w1, w2, w3] };
         },
-        
-        // Dạng 2: (Ax - By)^2 + 2ABxy => Rút gọn triệt tiêu hạng tử ở giữa thành tổng hai bình phương
+        // Dạng 2: Khuyết cụm 2AB ở giữa
         () => {
             let p1 = polyPow(polyMinus, 2);
-            let p2 = { "1,1": 2 * A * B }; // Hạng tử 2ABxy
+            let p2 = { [`${ex},${ey}`]: 2 * A * B }; // Hạng tử 2*A*B*(x^ex)*(y^ey)
             let finalPoly = polyAdd(p1, p2);
 
             let qStr = polyToString(finalPoly, varX, varY);
-            let aStr = `(${A}${varX} - ${B}${varY})<sup>2</sup> + ${2*A*B}.${varX}.${varY}`;
-            
-            let w1 = `(${A}${varX} + ${B}${varY})<sup>2</sup> + ${2*A*B}.${varX}.${varY}`;
-            let w2 = `(${A}${varX} - ${B}${varY})<sup>2</sup> - ${2*A*B}.${varX}.${varY}`;
-            let w3 = `(${A}${varX} - ${B}${varY})<sup>2</sup> + ${A*B}.${varX}.${varY}`;
+            let aStr = `(${strAx} - ${strBy})<sup>2</sup> + ${2*A*B}.${strX}.${strY}`;
+            let w1 = `(${strAx} + ${strBy})<sup>2</sup> + ${2*A*B}.${strX}.${strY}`;
+            let w2 = `(${strAx} - ${strBy})<sup>2</sup> - ${2*A*B}.${strX}.${strY}`;
+            let w3 = `(${strAx} - ${strBy})<sup>2</sup> + ${A*B}.${strX}.${strY}`;
             
             return { q: qStr, a: aStr, w: [w1, w2, w3] };
         },
-
-        // Dạng 3: (Ax + By)^2 - (Ax - By)^2 => Triệt tiêu hai đầu, chỉ còn lại hạng tử tích ở giữa
+        // Dạng 3: Triệt tiêu hai đầu (Hiệu hai bình phương mở rộng)
         () => {
             let p1 = polyPow(polyPlus, 2);
             let p2 = polyPow(polyMinus, 2);
             let finalPoly = polySub(p1, p2);
 
             let qStr = polyToString(finalPoly, varX, varY);
-            let aStr = `(${A}${varX} + ${B}${varY})<sup>2</sup> - (${A}${varX} - ${B}${varY})<sup>2</sup>`;
-            
-            let w1 = `(${A}${varX} + ${B}${varY})<sup>2</sup> + (${A}${varX} - ${B}${varY})<sup>2</sup>`;
-            let w2 = `(${A}${varX} - ${B}${varY})<sup>2</sup> - (${A}${varX} + ${B}${varY})<sup>2</sup>`;
-            let w3 = `(${A}${varX} + ${B}${varY})<sup>2</sup> - (${A}${varX} + ${B}${varY})<sup>2</sup>`;
+            let aStr = `(${strAx} + ${strBy})<sup>2</sup> - (${strAx} - ${strBy})<sup>2</sup>`;
+            let w1 = `(${strAx} + ${strBy})<sup>2</sup> + (${strAx} - ${strBy})<sup>2</sup>`;
+            let w2 = `(${strAx} - ${strBy})<sup>2</sup> - (${strAx} + ${strBy})<sup>2</sup>`;
+            let w3 = `(${strAx} + ${strBy})<sup>2</sup> - (${strAx} + ${strBy})<sup>2</sup>`;
             
             return { q: qStr, a: aStr, w: [w1, w2, w3] };
         },
-
-        // Dạng 4: Trộn Hằng đẳng thức một biến với một đa thức tự do bậc 2 bên ngoài: (Ax + B)^2 + Cx^2
+        // Dạng 4: Trộn Hằng đẳng thức một biến với một đa thức tự do bậc cao bên ngoài
         () => {
             const C = coeffs[Math.floor(Math.random() * coeffs.length)];
-            const polySinglePlus = { "1,0": A, "0,0": B }; // Đa thức dạng (Ax + B)
-            
             let p1 = polyPow(polySinglePlus, 2);
-            let p2 = { "2,0": C }; // Đa thức bổ sung tự do Cx^2
+            let p2 = { [`${ex * 2},0`]: C }; // Đa thức tự do C(x^ex)^2 = C.x^(2ex)
             let finalPoly = polyAdd(p1, p2);
 
             let qStr = polyToString(finalPoly, varX, varY);
-            let aStr = `(${A}${varX} + ${B})<sup>2</sup> + ${C}${varX}<sup>2</sup>`;
-            
-            let w1 = `(${A}${varX} - ${B})<sup>2</sup> + ${C}${varX}<sup>2</sup>`;
-            let w2 = `(${A}${varX} + ${B})<sup>2</sup> - ${C}${varX}<sup>2</sup>`;
-            let w3 = `(${A}${varX} + ${B})<sup>3</sup> + ${C}${varX}<sup>2</sup>`;
+            let aStr = `(${strAx} + ${B})<sup>2</sup> + ${C}${fVar(varX, ex * 2)}`;
+            let w1 = `(${strAx} - ${B})<sup>2</sup> + ${C}${fVar(varX, ex * 2)}`;
+            let w2 = `(${strAx} + ${B})<sup>2</sup> - ${C}${fVar(varX, ex * 2)}`;
+            let w3 = `(${strAx} + ${B})<sup>3</sup> + ${C}${fVar(varX, ex * 2)}`;
             
             return { q: qStr, a: aStr, w: [w1, w2, w3] };
         },
-
-        // Dạng 5: Hiệu hai lập phương biến tướng hệ quả cực hay: (Ax + By)^3 - (Ax - By)^3
-        // Máy sẽ tự động rút gọn chỉ còn lại các số hạng chứa x^2.y và y^3
+        // Dạng 5: Hiệu hai lập phương biến tướng
         () => {
             let p1 = polyPow(polyPlus, 3);
             let p2 = polyPow(polyMinus, 3);
             let finalPoly = polySub(p1, p2);
 
             let qStr = polyToString(finalPoly, varX, varY);
-            let aStr = `(${A}${varX} + ${B}${varY})<sup>3</sup> - (${A}${varX} - ${B}${varY})<sup>3</sup>`;
-            
-            let w1 = `(${A}${varX} + ${B}${varY})<sup>3</sup> + (${A}${varX} - ${B}${varY})<sup>3</sup>`;
-            let w2 = `(${A}${varX} - ${B}${varY})<sup>3</sup> - (${A}${varX} + ${B}${varY})<sup>3</sup>`;
-            let w3 = `(${A}${varX} + ${B}${varY})<sup>2</sup> - (${A}${varX} - ${B}${varY})<sup>2</sup>`;
+            let aStr = `(${strAx} + ${strBy})<sup>3</sup> - (${strAx} - ${strBy})<sup>3</sup>`;
+            let w1 = `(${strAx} + ${strBy})<sup>3</sup> + (${strAx} - ${strBy})<sup>3</sup>`;
+            let w2 = `(${strAx} - ${strBy})<sup>3</sup> - (${strAx} + ${strBy})<sup>3</sup>`;
+            let w3 = `(${strAx} + ${strBy})<sup>2</sup> - (${strAx} - ${strBy})<sup>2</sup>`;
             
             return { q: qStr, a: aStr, w: [w1, w2, w3] };
         },
-
-        // Dạng 6: Hằng đẳng thức đáng nhớ hệ quả Cauchy (Tổng hai lập phương rút gọn)
-        // Công thức: (Ax + By)^3 - 3ABxy(Ax + By) = A^3x^3 + B^3y^3
-        // Học sinh nhìn đề bài rút gọn "A^3x^3 + B^3y^3" sẽ phải tư duy rất nhiều
+        // Dạng 6: Hệ quả Cauchy (Tổng hai lập phương rút gọn)
         () => {
             let p1 = polyPow(polyPlus, 3);
-            let p3xy = { "1,1": 3 * A * B }; // 3ABxy
-            let p2 = polyMul(p3xy, polyPlus); // 3ABxy(Ax + By)
+            let p3xy = { [`${ex},${ey}`]: 3 * A * B }; 
+            let p2 = polyMul(p3xy, polyPlus); 
             let finalPoly = polySub(p1, p2); 
 
             let qStr = polyToString(finalPoly, varX, varY);
-            let aStr = `(${A}${varX} + ${B}${varY})<sup>3</sup> - ${3*A*B}.${varX}.${varY}.(${A}${varX} + ${B}${varY})`;
-            
-            let w1 = `(${A}${varX} + ${B}${varY})<sup>3</sup> + ${3*A*B}.${varX}.${varY}.(${A}${varX} + ${B}${varY})`;
-            let w2 = `(${A}${varX} - ${B}${varY})<sup>3</sup> - ${3*A*B}.${varX}.${varY}.(${A}${varX} - ${B}${varY})`;
-            let w3 = `(${A}${varX} + ${B}${varY})<sup>3</sup> - ${A*B}.${varX}.${varY}.(${A}${varX} + ${B}${varY})`;
+            let aStr = `(${strAx} + ${strBy})<sup>3</sup> - ${3*A*B}.${strX}.${strY}.(${strAx} + ${strBy})`;
+            let w1 = `(${strAx} + ${strBy})<sup>3</sup> + ${3*A*B}.${strX}.${strY}.(${strAx} + ${strBy})`;
+            let w2 = `(${strAx} - ${strBy})<sup>3</sup> - ${3*A*B}.${strX}.${strY}.(${strAx} - ${strBy})`;
+            let w3 = `(${strAx} + ${strBy})<sup>3</sup> - ${A*B}.${strX}.${strY}.(${strAx} + ${strBy})`;
             
             return { q: qStr, a: aStr, w: [w1, w2, w3] };
         },
-
         // Dạng 7: Hệ quả Cauchy cho Hiệu hai lập phương
-        // Công thức: (Ax - By)^3 + 3ABxy(Ax - By) = A^3x^3 - B^3y^3
         () => {
             let p1 = polyPow(polyMinus, 3);
-            let p3xy = { "1,1": 3 * A * B }; // 3ABxy
-            let p2 = polyMul(p3xy, polyMinus); // 3ABxy(Ax - By)
+            let p3xy = { [`${ex},${ey}`]: 3 * A * B }; 
+            let p2 = polyMul(p3xy, polyMinus); 
             let finalPoly = polyAdd(p1, p2);
 
             let qStr = polyToString(finalPoly, varX, varY);
-            let aStr = `(${A}${varX} - ${B}${varY})<sup>3</sup> + ${3*A*B}.${varX}.${varY}.(${A}${varX} - ${B}${varY})`;
-            
-            let w1 = `(${A}${varX} - ${B}${varY})<sup>3</sup> - ${3*A*B}.${varX}.${varY}.(${A}${varX} - ${B}${varY})`;
-            let w2 = `(${A}${varX} + ${B}${varY})<sup>3</sup> + ${3*A*B}.${varX}.${varY}.(${A}${varX} + ${B}${varY})`;
-            let w3 = `(${A}${varX} - ${B}${varY})<sup>3</sup> + ${A*B}.${varX}.${varY}.(${A}${varX} - ${B}${varY})`;
+            let aStr = `(${strAx} - ${strBy})<sup>3</sup> + ${3*A*B}.${strX}.${strY}.(${strAx} - ${strBy})`;
+            let w1 = `(${strAx} - ${strBy})<sup>3</sup> - ${3*A*B}.${strX}.${strY}.(${strAx} - ${strBy})`;
+            let w2 = `(${strAx} + ${strBy})<sup>3</sup> + ${3*A*B}.${strX}.${strY}.(${strAx} + ${strBy})`;
+            let w3 = `(${strAx} - ${strBy})<sup>3</sup> + ${A*B}.${strX}.${strY}.(${strAx} - ${strBy})`;
             
             return { q: qStr, a: aStr, w: [w1, w2, w3] };
         },
-
-        // Dạng 8: Trộn lập phương một biến với hằng số tự do bậc cao: (Ax + B)^3 - B^3
-        // Kết quả thu gọn triệt tiêu hệ số tự do, chỉ còn chuỗi bậc 3, bậc 2, bậc 1 liên tiếp
+        // Dạng 8: Trộn lập phương một biến với hằng số tự do
         () => {
-            const polySinglePlus = { "1,0": A, "0,0": B }; // Đa thức (Ax + B)
             let p1 = polyPow(polySinglePlus, 3);
-            let p2 = { "0,0": Math.pow(B, 3) }; // Hằng số B^3
+            let p2 = { "0,0": Math.pow(B, 3) }; 
             let finalPoly = polySub(p1, p2);
 
             let qStr = polyToString(finalPoly, varX, varY);
-            let aStr = `(${A}${varX} + ${B})<sup>3</sup> - ${Math.pow(B, 3)}`;
+            let aStr = `(${strAx} + ${B})<sup>3</sup> - ${Math.pow(B, 3)}`;
+            let w1 = `(${strAx} - ${B})<sup>3</sup> - ${Math.pow(B, 3)}`;
+            let w2 = `(${strAx} + ${B})<sup>3</sup> + ${Math.pow(B, 3)}`;
+            let w3 = `(${strAx} + ${B})<sup>2</sup> - ${Math.pow(B, 2)}`;
             
-            let w1 = `(${A}${varX} - ${B})<sup>3</sup> - ${Math.pow(B, 3)}`;
-            let w2 = `(${A}${varX} + ${B})<sup>3</sup> + ${Math.pow(B, 3)}`;
-            let w3 = `(${A}${varX} + ${B})<sup>2</sup> - ${Math.pow(B, 2)}`;
-            
+            return { q: qStr, a: aStr, w: [w1, w2, w3] };
+        },
+        // ==========================================
+        // 8 DẠNG ĐẢO NGƯỢC (Cho Khai triển -> Yêu cầu Thu gọn)
+        // ==========================================
+        () => {
+            let p1 = polyPow(polyPlus, 2);
+            let p2 = polyMul(polyPlus, polyMinus);
+            // Q là chuỗi khai triển, A là kết quả đa thức
+            let qStr = `(${strAx} + ${strBy})<sup>2</sup> + (${strAx} + ${strBy}).(${strAx} - ${strBy})`;
+            let aStr = polyToString(polyAdd(p1, p2), varX, varY);
+            // Nhờ máy tính cố tình làm sai phép toán để tạo đáp án nhiễu
+            let w1 = polyToString(polySub(p1, p2), varX, varY);
+            let w2 = polyToString(polyAdd(polyPow(polyMinus, 2), p2), varX, varY);
+            let w3 = polyToString(polyAdd(p1, p1), varX, varY);
+            return { q: qStr, a: aStr, w: [w1, w2, w3] };
+        },
+        () => {
+            let p1 = polyPow(polyMinus, 2);
+            let p2 = { [`${ex},${ey}`]: 2 * A * B }; 
+            let qStr = `(${strAx} - ${strBy})<sup>2</sup> + ${2*A*B}.${strX}.${strY}`;
+            let aStr = polyToString(polyAdd(p1, p2), varX, varY);
+            let w1 = polyToString(polySub(p1, p2), varX, varY);
+            let w2 = polyToString(polyAdd(polyPow(polyPlus, 2), p2), varX, varY);
+            let w3 = polyToString(polyAdd(p1, { [`${ex},${ey}`]: A * B }), varX, varY);
+            return { q: qStr, a: aStr, w: [w1, w2, w3] };
+        },
+        () => {
+            let p1 = polyPow(polyPlus, 2);
+            let p2 = polyPow(polyMinus, 2);
+            let qStr = `(${strAx} + ${strBy})<sup>2</sup> - (${strAx} - ${strBy})<sup>2</sup>`;
+            let aStr = polyToString(polySub(p1, p2), varX, varY);
+            let w1 = polyToString(polyAdd(p1, p2), varX, varY);
+            let w2 = polyToString(polySub(p2, p1), varX, varY);
+            let w3 = polyToString(polySub(p1, { [`${ex},${ey}`]: 2 * A * B }), varX, varY);
+            return { q: qStr, a: aStr, w: [w1, w2, w3] };
+        },
+        () => {
+            const C = coeffs[Math.floor(Math.random() * coeffs.length)];
+            let p1 = polyPow(polySinglePlus, 2);
+            let p2 = { [`${ex * 2},0`]: C }; 
+            let qStr = `(${strAx} + ${B})<sup>2</sup> + ${C}${fVar(varX, ex * 2)}`;
+            let aStr = polyToString(polyAdd(p1, p2), varX, varY);
+            let w1 = polyToString(polySub(p1, p2), varX, varY);
+            let w2 = polyToString(polyAdd(polyPow({ [`${ex},0`]: A, "0,0": -B }, 2), p2), varX, varY);
+            let w3 = polyToString(polyAdd(p1, { [`${ex * 2},0`]: -C }), varX, varY);
+            return { q: qStr, a: aStr, w: [w1, w2, w3] };
+        },
+        () => {
+            let p1 = polyPow(polyPlus, 3);
+            let p2 = polyPow(polyMinus, 3);
+            let qStr = `(${strAx} + ${strBy})<sup>3</sup> - (${strAx} - ${strBy})<sup>3</sup>`;
+            let aStr = polyToString(polySub(p1, p2), varX, varY);
+            let w1 = polyToString(polyAdd(p1, p2), varX, varY);
+            let w2 = polyToString(polySub(p2, p1), varX, varY);
+            let w3 = polyToString(polySub(polyPow(polyPlus, 2), polyPow(polyMinus, 2)), varX, varY);
+            return { q: qStr, a: aStr, w: [w1, w2, w3] };
+        },
+        () => {
+            let p1 = polyPow(polyPlus, 3);
+            let p3xy = { [`${ex},${ey}`]: 3 * A * B }; 
+            let p2 = polyMul(p3xy, polyPlus); 
+            let qStr = `(${strAx} + ${strBy})<sup>3</sup> - ${3*A*B}.${strX}.${strY}.(${strAx} + ${strBy})`;
+            let aStr = polyToString(polySub(p1, p2), varX, varY);
+            let w1 = polyToString(polyAdd(p1, p2), varX, varY);
+            let w2 = polyToString(polySub(polyPow(polyMinus, 3), polyMul(p3xy, polyMinus)), varX, varY);
+            let w3 = polyToString(polySub(p1, polyMul({ [`${ex},${ey}`]: A * B }, polyPlus)), varX, varY);
+            return { q: qStr, a: aStr, w: [w1, w2, w3] };
+        },
+        () => {
+            let p1 = polyPow(polyMinus, 3);
+            let p3xy = { [`${ex},${ey}`]: 3 * A * B }; 
+            let p2 = polyMul(p3xy, polyMinus); 
+            let qStr = `(${strAx} - ${strBy})<sup>3</sup> + ${3*A*B}.${strX}.${strY}.(${strAx} - ${strBy})`;
+            let aStr = polyToString(polyAdd(p1, p2), varX, varY);
+            let w1 = polyToString(polySub(p1, p2), varX, varY);
+            let w2 = polyToString(polyAdd(polyPow(polyPlus, 3), polyMul(p3xy, polyPlus)), varX, varY);
+            let w3 = polyToString(polyAdd(p1, polyMul({ [`${ex},${ey}`]: A * B }, polyMinus)), varX, varY);
+            return { q: qStr, a: aStr, w: [w1, w2, w3] };
+        },
+        () => {
+            let p1 = polyPow(polySinglePlus, 3);
+            let p2 = { "0,0": Math.pow(B, 3) }; 
+            let qStr = `(${strAx} + ${B})<sup>3</sup> - ${Math.pow(B, 3)}`;
+            let aStr = polyToString(polySub(p1, p2), varX, varY);
+            let w1 = polyToString(polyAdd(p1, p2), varX, varY);
+            let w2 = polyToString(polySub(polyPow({ [`${ex},0`]: A, "0,0": -B }, 3), { "0,0": -Math.pow(B, 3) }), varX, varY);
+            let w3 = polyToString(polySub(polyPow(polySinglePlus, 2), { "0,0": Math.pow(B, 2) }), varX, varY);
             return { q: qStr, a: aStr, w: [w1, w2, w3] };
         }
     ];
@@ -260,7 +335,6 @@ function generateAsianQuestion() {
     const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
     return randomTemplate();
 }
-
 
 // --- 3. QUẢN LÝ TRẠNG THÁI TRÒ CHƠI & UI WORKFLOW ---
 

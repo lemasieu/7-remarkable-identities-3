@@ -1,71 +1,91 @@
-# 7-remarkable-identities-3 🧠 [Asian Mode - Ultimate Edition]
+# 7 Remarkable Identities 3
 
-An ultimate-tier interactive quiz web application designed to push algebraic thinking to its absolute limits ("Asian Mode"). Version 3 completely abandons static text parsing, introducing a custom, lightweight **Mini Algebraic Engine** built from scratch in pure JavaScript to compute, expand, distribute, and simplify complex 2nd and 3rd-degree polynomials on the fly.
+An interactive quiz web application designed to help learners practice and master the **7 Remarkable Algebraic Identities** in mathematics. This is the **version 3** release, featuring the **hardest difficulty level** in the series and a **multiple-choice quiz format** for focused, high-intensity practice.
 
-🌐 **Live Demo:** [https://xn--msiu-goa8b.vn/github/7-remarkable-identities-3/](https://xn--msiu-goa8b.vn/github/7-remarkable-identities-3/)
+## 🚀 Live Demo
 
----
+Check out the live demo: [https://www.sieu.io.vn/github/7-remarkable-identities-3](https://www.sieu.io.vn/github/7-remarkable-identities-3)
 
-## ✨ Ultimate Features (What's New in V3?)
+## ✨ Features
 
-- 🔥 **Complex Mix-Match Templates:** Questions are styled after elite mathematical olympiad structures. The system algorithmically blends multiple identities together or introduces external high-degree free terms (e.g., Cauchy's sum/difference of cubes, advanced factoring, hidden expansions).
-- 🧮 **Built-in Mini Algebraic Engine:** Polynomials are fully decoupled from strings and stored as smart Object data structures (`{ "ExpX,ExpY": Coefficient }`). The core mathematical engine executes pure algebraic operations natively:
-  - `polyAdd(p1, p2)`: Combines like-terms seamlessly.
-  - `polySub(p1, p2)`: Performs polynomial subtraction arithmetic.
-  - `polyMul(p1, p2)`: Evaluates FOIL/distributive distribution while compounding exponents.
-  - `polyPow(p, n)`: Raises binomials to any arbitrary power (perfectly processing 2nd and 3rd degrees).
-- 🧼 **Zero-Dependency Absolute Reduction:** The backend engine automatically evaluates the right-hand side (RHS) to form questions. If middle terms cancel out to `0` (e.g., $+6xy$ and $-6xy$), they instantly vanish. Leading or hidden coefficients of `1` are cleanly truncated (displaying `x²` instead of `1.x²`) according to strict textbook notations.
-- 📐 **Diverse Variables & 3rd-Degree Mastery:** To maximize visual complexity, variables are dynamically swapped among pools of $(x, y)$, $(a, b)$, and $(u, v)$, layered with clean `<sup>3</sup>` HTML tags.
-- 📊 **Real-time Performance Tracker:** Keeps a live score of your current run, displaying correct answers against total attempts along with your real-time accuracy rate (`%`).
+- **Dynamic Question Generation** – Automatically picks 1 out of the 7 algebraic identities and randomizes the variable placeholders (using characters from `a-z` and `0-9`) to provide fresh, non-repetitive math problems
+- **Bi-directional Quizzing** – Supports both forward direction (expanding products/powers into polynomials) and backward direction (factoring polynomials back into simplified expressions)
+- **Highest Difficulty (Version 3)** – Questions feature **complex, multi-step expressions, nested operations, and highly non-obvious patterns**, requiring a deep and fluent mastery of all 7 identities
+- **Multiple-Choice Format** – Four answer options are provided for each question, with exactly one correct answer
+- **Smart Term Shuffling** – Polynomial terms and product factors are shuffled randomly. The system intelligently handles mathematical signs (`+` / `-`), auto-formatting the leading term cleanly (e.g., hiding an unnecessary leading `+` while preserving `-`)
+- **Standardized Notation** – Explicitly uses dot notation (`.`) to denote multiplication between variables and grouped parentheses for clear mathematical readability
+- **Real-Time Statistics** – Displays a live tracker for correct answers over total questions answered, along with an accuracy percentage (`%`)
+- **Instant Feedback** – After selecting your answer, the tool tells you immediately whether it is correct and highlights the right answer
+- **Minimalist, Clean UI** – A modern interface with smooth transition effects when hovering or selecting choices
+- **Responsive Design** – Works seamlessly on desktop, tablet, and mobile devices
 
----
+## 🆕 What's New in Version 3
 
-## 📁 Technical Breakdown
+- **Maximum difficulty** – Questions now feature the **most complex variable combinations and operations** in the series, making this the ultimate test of algebraic identity mastery
+- **Multiple-choice format** – Retains the **four-option multiple-choice format** for fast, engaging practice
+- **Enhanced question generation** – Advanced algorithms for maximum variety and minimal repetition
+- **Refined UI** – Smoother transitions and hover states for a polished feel
+- **Minor bug fixes and performance optimizations** over the previous releases
 
-The core system relies heavily on 3 clean, decoupled files:
-- `index.html`: Workspace structuring utilizing designated HTML tags for pristine mathematical rendering.
-- `style.css`: Modern minimalist aesthetic with smooth color feedback states (green/red) for rapid validation.
-- `script.js`: **The Ultimate Upgrade.** Houses the core Polynomial Dictionary Engine and 8 high-difficulty math templates.
+## 🛠️ Technologies Used
 
----
+- **HTML5** – Defines the layout structure (quiz card, scoreboard, question box, and options container)
+- **CSS3** – Powers the modern UI look, featuring smooth transition effects when hovering or selecting choices
+- **JavaScript (Vanilla)** – Contains all algorithmic logic (Fisher-Yates shuffle), expression compilation, and scoring state management
 
-## 🚀 Getting Started Locally
+## 📁 Project Structure
 
-Run this application instantly under any local environment with zero dependencies. No NodeJS, no bundling compilers, and no external CDN mathematical libraries (such as Math.js or Algebrite) required:
+```
+7-remarkable-identities-3/
+├── index.html            # Defines the layout structure (Quiz Card, scoreboard, question box, and options container)
+├── style.css             # Powers the modern UI look, featuring smooth transition effects
+├── script.js             # Contains all algorithmic logic (Fisher-Yates shuffle), expression compilation, and scoring state management
+└── README.md             # Project documentation
+```
 
-1. **Clone this repository:**
+## 🔧 Installation & Usage
+
+1. **Clone the repository**
    ```bash
-   git clone [https://github.com/lemasieu/7-remarkable-identities-3.git](https://github.com/lemasieu/7-remarkable-identities-3.git)
+   git clone https://github.com/lemasieu/7-remarkable-identities-3.git
    ```
-2. **Navigate into the project directory:**
+2. **Navigate to the project folder**   
    ```bash
    cd 7-remarkable-identities-3
    ```
-3. **Launch the application**
-Simply double-click the `index.html` file to open and run it instantly in any modern web browser.
+3. **Open the application**
+   - Simply open `index.html` in your web browser
+   - Or use a local development server (e.g., Live Server in VS Code)
 
-## 🛠️ Deployment / Git Push Guide
-If you want to initialize Git locally and push the source code to your GitHub repository `lemasieu/7-remarkable-identities-3`, execute the following commands in your terminal:
-   ```bash
-# Initialize local git profile
-git init
+## 📝 How It Works
 
-# Stage all updated file structures
-git add .
+1. **A question is displayed** – The app picks one of the 7 remarkable identities and generates a randomized problem, either in forward direction (expansion) or backward direction (factorization)
+2. **Choose your answer** – Select one of the multiple-choice options provided
+3. **Receive instant feedback** – If your answer is correct, it is highlighted in green. If incorrect, your choice is marked in red and the correct answer is highlighted in green
+4. **Track your progress** – The scoreboard updates in real time, showing:
+   - **Correct** – Number of correct answers
+   - **Total** – Total number of questions answered
+   - **Accuracy** – Success rate as a percentage (`%`)
+   - **Continue** – Click the "Next Question" button to generate a new random problem
 
-# Commit with a clear scope
-git commit -m "Initial commit: Deploy 7 Remarkable Identities V2 with coefficient reduction"
+**The 7 Remarkable Algebraic Identities covered:**
 
-# Enforce default branch naming convention
-git branch -M main
+1. $(a + b)^2 = a^2 + 2ab + b^2$
+2. $(a - b)^2 = a^2 - 2ab + b^2$
+3. $a^2 - b^2 = (a - b)(a + b)$
+4. $(a + b)^3 = a^3 + 3a^2b + 3ab^2 + b^3$
+5. $(a - b)^3 = a^3 - 3a^2b + 3ab^2 - b^3$
+6. $a^3 + b^3 = (a + b)(a^2 - ab + b^2)$
+7. $a^3 - b^3 = (a - b)(a^2 + ab + b^2)$
 
-# Link to the secondary repository
-git remote add origin [https://github.com/lemasieu/7-remarkable-identities-3.git](https://github.com/lemasieu/7-remarkable-identities-3.git)
+## 🤝 Contributing
 
-# Push upstream to GitHub
-git push -u origin main
-   ```
+Contributions are welcome! Feel free to submit a Pull Request or open an Issue.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## 📝 License
-This project is licensed under the terms of the MIT License. You are completely free to use, modify, and distribute it.
-Created by Gemini with my idea.
+## 📄 License
+This project is open-source and available under the MIT License.
